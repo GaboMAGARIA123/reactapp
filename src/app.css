@@ -1,0 +1,20 @@
+.container {
+    display: flex;
+}
+
+body {
+    background-color: #f5f7fa;
+    justify-content: center;
+    align-items: center;
+}
+
+ul {
+    background-color: white;
+
+}
+
+li {
+    background-color: #ffffff;
+    border: 1px solid #e0e6ed;
+    padding: 10px;
+}
