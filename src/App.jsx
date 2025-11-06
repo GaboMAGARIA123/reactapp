@@ -24,7 +24,6 @@ function App() {
 
     setErrors(newErrors);
 
-    // If no errors
     if (Object.keys(newErrors).length === 0) {
       alert("Signed up successfully!");
     }
