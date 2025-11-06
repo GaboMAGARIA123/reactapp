@@ -1,3 +1,4 @@
+// src/hooks/useFormValidation.js
 import { useState } from "react";
 
 export default function useFormValidation(initialFields) {
@@ -16,15 +17,10 @@ export default function useFormValidation(initialFields) {
     const newErrors = {};
     Object.entries(rules).forEach(([key, rule]) => {
       const value = fields[key]?.trim?.() || fields[key];
-
-      if (rule.required && !value)
-        newErrors[key] = rule.message || `${key} is required`;
-      else if (rule.pattern && !rule.pattern.test(value))
-        newErrors[key] = rule.message || `Invalid ${key}`;
-      else if (rule.match && value !== fields[rule.match])
-        newErrors[key] = rule.message || `${key} must match ${rule.match}`;
+      if (rule.required && !value) newErrors[key] = rule.message || `${key} is required`;
+      else if (rule.pattern && !rule.pattern.test(value)) newErrors[key] = rule.message || `Invalid ${key}`;
+      else if (rule.match && value !== fields[rule.match]) newErrors[key] = rule.message || `${key} must match ${rule.match}`;
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
