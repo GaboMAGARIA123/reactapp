@@ -1,32 +1,32 @@
 import { useState } from "react";
-
 import Login from "./viwes/login.jsx";
 import Registration from "./viwes/registration.jsx";
 import ForgotPass from "./viwes/Passwordforgot.jsx";
+import "./app.css";
 
-function App() {
+export default function App() {
   const [currentForm, setCurrentForm] = useState("Login");
 
-  const handleGoToLogin = () => setCurrentForm("Login");
-  const handleGoToRegistration = () => setCurrentForm("Registration");
-  const handleForgotPass = () => setCurrentForm("Passwordforgot");
+  const goToLogin = () => setCurrentForm("Login");
+  const goToRegistration = () => setCurrentForm("Registration");
+  const goToForgot = () => setCurrentForm("ForgotPass");
 
   return (
-    <div className="container">
-      {currentForm === "Registration" && (
-        <Registration onGoToLogin={handleGoToLogin} />
-      )}
+    <div className="page-wrapper">
       {currentForm === "Login" && (
         <Login
-          onCreateAcc={handleGoToRegistration}
-          onForgotPass={handleForgotPass}
+          onGoToRegistration={goToRegistration}
+          onGoToForgot={goToForgot}
         />
       )}
-      {currentForm === "Passwordforgot" && (
-        <ForgotPass onGoToLogin={handleGoToLogin} />
+
+      {currentForm === "Registration" && (
+        <Registration onGoToLogin={goToLogin} />
+      )}
+
+      {currentForm === "ForgotPass" && (
+        <ForgotPass onGoToLogin={goToLogin} />
       )}
     </div>
   );
 }
-
-export default App;

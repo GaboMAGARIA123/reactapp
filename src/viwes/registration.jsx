@@ -1,144 +1,85 @@
-import { useState, useEffect } from "react";
+import useFormValidation from "../hooks/useFormValidation";
 
-function Registration({ onGoToLogin }) {
-  const [gender, setGender] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
-  const [agree, setAgree] = useState(false);
-  const [errors, setErrors] = useState({});
+export default function Registration({ onGoToLogin }) {
+  const { fields, errors, handleChange, validate } = useFormValidation({
+    fullName: "",
+    email: "",
+    password: "",
+    confirm: "",
+    agree: false,
+  });
 
-  const handleSignup = () => {
-    const newErrors = {};
-
-    if (name.trim() === "") newErrors.name = "Please enter your full name";
-    if (email.trim() === "" || !email.includes("@"))
-      newErrors.email = "Please enter a valid email address";
-    if (pass.trim() === "") newErrors.pass = "Please enter a password";
-    if (pass !== confirmPass)
-      newErrors.confirmPass = "Passwords do not match";
-    if (gender === "") newErrors.gender = "Please select a gender";
-    if (!agree)
-      newErrors.agree = "You must agree to the Terms and Privacy Policy";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Signed up successfully!");
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = validate({
+      fullName: { required: true, message: "Full name required" },
+      email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+      password: { required: true },
+      confirm: { required: true, match: "password", message: "Passwords must match" },
+      agree: { required: true, message: "You must agree to continue" },
+    });
+    if (isValid) alert("Registered successfully!");
   };
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const timer = setTimeout(() => setErrors({}), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [errors]);
-
   return (
-    <>
-    <div className="container">
-      <h1>Register</h1>
-      <div className="input-con">
+    <div className="app-container">
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
         <label>Full Name</label>
         <input
           type="text"
-          placeholder="Enter your full name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="fullName"
+          value={fields.fullName}
+          onChange={handleChange}
+          className={errors.fullName ? "error" : ""}
+          placeholder="Enter full name"
         />
-        {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+        {errors.fullName && <div className="error-message">{errors.fullName}</div>}
 
-        <label>Email Address</label>
+        <label>Email</label>
         <input
           type="email"
+          name="email"
+          value={fields.email}
+          onChange={handleChange}
+          className={errors.email ? "error" : ""}
           placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
         />
-        {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+        {errors.email && <div className="error-message">{errors.email}</div>}
 
         <label>Password</label>
         <input
           type="password"
+          name="password"
+          value={fields.password}
+          onChange={handleChange}
+          className={errors.password ? "error" : ""}
           placeholder="Enter password"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
         />
-        {errors.pass && <p style={{ color: "red" }}>{errors.pass}</p>}
+        {errors.password && <div className="error-message">{errors.password}</div>}
 
         <label>Confirm Password</label>
         <input
           type="password"
+          name="confirm"
+          value={fields.confirm}
+          onChange={handleChange}
+          className={errors.confirm ? "error" : ""}
           placeholder="Confirm password"
-          value={confirmPass}
-          onChange={(e) => setConfirmPass(e.target.value)}
         />
-        {errors.confirmPass && (
-          <p style={{ color: "red" }}>{errors.confirmPass}</p>
-        )}
-      </div>
+        {errors.confirm && <div className="error-message">{errors.confirm}</div>}
 
-      <h3>Gender</h3>
-      <div className="Gen">
         <label>
-          <input
-            type="radio"
-            name="gender"
-            value="male"
-            checked={gender === "male"}
-            onChange={(e) => setGender(e.target.value)}
-          />
-          Male
+          <input type="checkbox" name="agree" checked={fields.agree} onChange={handleChange} />
+          I agree to Terms & Privacy
         </label>
-        <label>
-          <input
-            type="radio"
-            name="gender"
-            value="female"
-            checked={gender === "female"}
-            onChange={(e) => setGender(e.target.value)}
-          />
-          Female
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="gender"
-            value="other"
-            checked={gender === "other"}
-            onChange={(e) => setGender(e.target.value)}
-          />
-          Other
-        </label>
-      </div>
-      {errors.gender && <p style={{ color: "red" }}>{errors.gender}</p>}
+        {errors.agree && <div className="error-message">{errors.agree}</div>}
 
-      <label>
-        <input
-          type="checkbox"
-          checked={agree}
-          onChange={(e) => setAgree(e.target.checked)}
-        />
-        I agree to the Terms and Privacy Policy
-      </label>
-      {errors.agree && <p style={{ color: "red" }}>{errors.agree}</p>}
-
-      <button onClick={handleSignup}>Sign Up</button>
-
+        <button type="submit">Sign Up</button>
+      </form>
       <p>
-        Already have an account?
-        <span
-          style={{ color: "#0077cc", cursor: "pointer", marginLeft: 6 }}
-          onClick={() => onGoToLogin && onGoToLogin()}
-        >
-          Log in
-        </span>
+        Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); onGoToLogin(); }}>Login</a>
       </p>
-      </div>
-    </>
+    </div>
   );
 }
-
-export default Registration;

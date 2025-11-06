@@ -1,53 +1,36 @@
-import { useState, useEffect } from "react";
+import useFormValidation from "../hooks/useFormValidation";
 
-function ForgotPass({ onGoToLogin }) {
-  const [email, setEmail] = useState("");
-  const [errors, setErrors] = useState({});
+export default function ForgotPass({ onGoToLogin }) {
+  const { fields, errors, handleChange, validate } = useFormValidation({ email: "" });
 
-  const handleSubmit = () => {
-    const newErrors = {};
-    if (email.trim() === "" || !email.includes("@"))
-      newErrors.email = "Please enter a valid email address";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Password recovery link sent!");
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = validate({
+      email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+    });
+    if (isValid) alert("Password reset link has been sent to your email!");
   };
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const timer = setTimeout(() => setErrors({}), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [errors]);
-
   return (
-    <div className="container">
-      <h1>Forgot Password</h1>
-      <label>Email Address</label>
-      <input
-        type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+    <div className="app-container">
+      <h2>Forgot Password</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Email Address</label>
+        <input
+          type="email"
+          name="email"
+          value={fields.email}
+          onChange={handleChange}
+          className={errors.email ? "error" : ""}
+          placeholder="you@example.com"
+        />
+        {errors.email && <div className="error-message">{errors.email}</div>}
 
-      <button onClick={handleSubmit}>Submit</button>
-
+        <button type="submit">Submit</button>
+      </form>
       <p>
-        Remember your password?
-        <span
-          style={{ color: "#0077cc", cursor: "pointer", marginLeft: 6 }}
-          onClick={() => onGoToLogin && onGoToLogin()}
-        >
-          Log in
-        </span>
+        Remember your password? <a href="#" onClick={(e) => { e.preventDefault(); onGoToLogin(); }}>Log in</a>
       </p>
     </div>
   );
 }
-
-export default ForgotPass;

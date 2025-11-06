@@ -1,72 +1,52 @@
-import { useState, useEffect } from "react";
+import useFormValidation from "../hooks/useFormValidation";
 
-function Login({ onCreateAcc, onForgotPass }) {
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [errors, setErrors] = useState({});
+export default function Login({ onGoToRegistration, onGoToForgot }) {
+  const { fields, errors, handleChange, validate } = useFormValidation({
+    email: "",
+    password: "",
+  });
 
-  const handleLogin = () => {
-    const newErrors = {};
-    if (email.trim() === "" || !email.includes("@"))
-      newErrors.email = "Please enter a valid email address";
-    if (pass.trim() === "") newErrors.pass = "Please enter a password";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Logged in successfully!");
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = validate({
+      email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+      password: { required: true },
+    });
+    if (isValid) alert("Login successful!");
   };
 
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const timer = setTimeout(() => setErrors({}), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [errors]);
-
   return (
-    <div className="container">
-      <h1>Login</h1>
+    <div className="app-container">
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          value={fields.email}
+          onChange={handleChange}
+          className={errors.email ? "error" : ""}
+          placeholder="you@example.com"
+        />
+        {errors.email && <div className="error-message">{errors.email}</div>}
 
-      <label>Email Address</label>
-      <input
-        type="email"
-        placeholder="you@example.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          value={fields.password}
+          onChange={handleChange}
+          className={errors.password ? "error" : ""}
+          placeholder="Enter password"
+        />
+        {errors.password && <div className="error-message">{errors.password}</div>}
 
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="Enter password"
-        value={pass}
-        onChange={(e) => setPass(e.target.value)}
-      />
-      {errors.pass && <p style={{ color: "red" }}>{errors.pass}</p>}
-
-      <span
-        style={{ color: "#0077cc", cursor: "pointer", marginLeft: 6 }}
-        onClick={() => onForgotPass && onForgotPass()}
-      >
-        Forgot Password?
-      </span>
-
-      <button onClick={handleLogin}>Login</button>
-
+        <a href="#" onClick={(e) => { e.preventDefault(); onGoToForgot(); }}>Forgot Password?</a>
+        <button type="submit">Login</button>
+      </form>
       <p>
-        Don't have an account?
-        <span
-          style={{ color: "#0077cc", cursor: "pointer", marginLeft: 6 }}
-          onClick={() => onCreateAcc && onCreateAcc()}
-        >
-          Create account
-        </span>
+        Don’t have an account? <a href="#" onClick={(e) => { e.preventDefault(); onGoToRegistration(); }}>Create account</a>
       </p>
     </div>
   );
 }
-
-export default Login;
